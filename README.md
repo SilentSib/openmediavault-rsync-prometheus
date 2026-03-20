@@ -99,7 +99,7 @@ OMV cron daemon
 On a Debian 12 build machine:
 
 ```bash
-git clone https://github.com/yourname/openmediavault-rsync-prometheus
+git clone https://github.com/SilentSib/openmediavault-rsync-prometheus
 cd openmediavault-rsync-prometheus
 dpkg-buildpackage -us -uc -b
 ```
