@@ -1,0 +1,60 @@
+#!/bin/sh
+# /usr/share/openmediavault/scripts/omv-rsync-prometheus-test
+#
+# Manually push a test metric to verify Pushgateway connectivity.
+# Usage: omv-rsync-prometheus-test
+#
+# Reads config from omv-confdbadm.
+
+set -e
+
+. /usr/share/openmediavault/scripts/helper-functions
+
+ENABLE=$(omv_config_get "/config/services/rsyncp/enable")
+URL=$(omv_config_get "/config/services/rsyncp/pushgateway_url")
+USER=$(omv_config_get "/config/services/rsyncp/username")
+PASS=$(omv_config_get "/config/services/rsyncp/password")
+PREFIX=$(omv_config_get "/config/services/rsyncp/job_label_prefix")
+INSTANCE=$(omv_config_get "/config/services/rsyncp/instance")
+TLS_VERIFY=$(omv_config_get "/config/services/rsyncp/tls_verify")
+
+if [ "$ENABLE" != "1" ]; then
+    echo "Plugin is disabled. Enable it in Services > Rsync Metrics first." >&2
+    exit 1
+fi
+
+if [ -z "$URL" ]; then
+    echo "No Pushgateway URL configured." >&2
+    exit 1
+fi
+
+INSTANCE="${INSTANCE:-$(hostname)}"
+JOB_LABEL="${PREFIX}_test"
+TLS_FLAG=""
+AUTH_FLAG=""
+
+[ "$TLS_VERIFY" = "0" ] && TLS_FLAG="--insecure"
+[ -n "$USER" ] && AUTH_FLAG="-u ${USER}:${PASS}"
+
+METRICS=$(cat <<PROM
+# HELP omv_rsync_plugin_test Connectivity test metric from openmediavault-rsync-prometheus.
+# TYPE omv_rsync_plugin_test gauge
+omv_rsync_plugin_test{instance="${INSTANCE}"} 1
+PROM
+)
+
+echo "Sending test metric to: ${URL}/metrics/job/${JOB_LABEL}/instance/${INSTANCE}"
+# shellcheck disable=SC2086
+echo "$METRICS" | curl \
+    --silent \
+    --show-error \
+    --fail \
+    --max-time 10 \
+    $TLS_FLAG \
+    $AUTH_FLAG \
+    --request POST \
+    --data-binary @- \
+    "${URL}/metrics/job/${JOB_LABEL}/instance/${INSTANCE}"
+
+echo ""
+echo "Test metric pushed successfully."

@@ -1,0 +1,41 @@
+#!/bin/sh
+set -e
+
+. /usr/share/openmediavault/scripts/helper-functions
+
+case "$1" in
+    purge)
+        # Remove config node directly via xmlstarlet — omv-confdbadm delete
+        # requires the datamodel file which is already gone at purge time.
+        if omv_config_exists "/config/services/rsyncp"; then
+            omv_config_delete "/config/services/rsyncp"
+        fi
+
+        # Remove generated wrapper scripts
+        rm -rf /usr/local/lib/omv-rsync-prometheus || true
+
+        # Restore crontab to direct calls if still patched
+        if [ -f /etc/cron.d/openmediavault-rsync ]; then
+            sed -i \
+                's|/usr/local/lib/omv-rsync-prometheus/rsync-|/var/lib/openmediavault/cron.d/rsync-|g' \
+                /etc/cron.d/openmediavault-rsync || true
+        fi
+
+        # Rebuild the workbench without our navigation entry
+        omv-mkworkbench all || true
+
+        # Restart engined so it no longer loads our rpc/module
+        deb-systemd-invoke restart openmediavault-engined || true
+        ;;
+
+    remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        ;;
+
+    *)
+        echo "postrm called with unknown argument '$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+exit 0

@@ -1,0 +1,38 @@
+{
+    "type": "rpc",
+    "id": "rpc.rsyncp.setsettings",
+    "params": {
+        "type": "object",
+        "properties": {
+            "enable": {
+                "type": "boolean",
+                "required": true
+            },
+            "pushgateway_url": {
+                "type": "string",
+                "required": true
+            },
+            "username": {
+                "type": "string",
+                "required": true
+            },
+            "password": {
+                "type": "string",
+                "required": true
+            },
+            "job_label_prefix": {
+                "type": "string",
+                "minLength": 1,
+                "required": true
+            },
+            "instance": {
+                "type": "string",
+                "required": true
+            },
+            "tls_verify": {
+                "type": "boolean",
+                "required": true
+            }
+        }
+    }
+}

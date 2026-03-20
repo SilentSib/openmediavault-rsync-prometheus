@@ -1,0 +1,8 @@
+version: "1.0"
+type: route
+data:
+  url: "/services/rsync-prometheus"
+  title: _("Rsync Metrics")
+  editing: true
+  notificationTitle: _("Updated Rsync Prometheus Metrics settings.")
+  component: omv-services-rsync-prometheus-settings-form-page

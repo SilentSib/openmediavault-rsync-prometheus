@@ -1,0 +1,38 @@
+{
+    "type": "config",
+    "id": "conf.service.rsyncp",
+    "queryinfo": {
+        "xpath": "//services/rsyncp",
+        "iterable": false
+    },
+    "properties": {
+        "enable": {
+            "type": "boolean",
+            "default": false
+        },
+        "pushgateway_url": {
+            "type": "string",
+            "default": ""
+        },
+        "username": {
+            "type": "string",
+            "default": ""
+        },
+        "password": {
+            "type": "string",
+            "default": ""
+        },
+        "job_label_prefix": {
+            "type": "string",
+            "default": "omv_rsync"
+        },
+        "instance": {
+            "type": "string",
+            "default": ""
+        },
+        "tls_verify": {
+            "type": "boolean",
+            "default": true
+        }
+    }
+}

@@ -1,0 +1,53 @@
+version: "1.0"
+type: component
+data:
+  name: omv-services-rsync-prometheus-settings-form-page
+  type: formPage
+  config:
+    request:
+      service: RsyncPrometheus
+      get:
+        method: getSettings
+      post:
+        method: setSettings
+    fields:
+      - type: checkbox
+        name: enable
+        label: _("Enabled")
+        hint: _("Push success/failure metrics for each rsync job to a Prometheus Pushgateway.")
+        value: false
+      - type: textInput
+        name: pushgateway_url
+        label: _("Pushgateway URL")
+        hint: _("Base URL of your Prometheus Pushgateway, e.g. https://pushgateway.local:9091")
+        value: ""
+      - type: checkbox
+        name: tls_verify
+        label: _("Verify TLS certificate")
+        hint: _("Uncheck for self-signed certificates.")
+        value: true
+      - type: textInput
+        name: username
+        label: _("Username")
+        hint: _("HTTP Basic Auth username. Leave empty if unauthenticated.")
+        value: ""
+      - type: passwordInput
+        name: password
+        label: _("Password")
+        hint: _("HTTP Basic Auth password.")
+        value: ""
+      - type: textInput
+        name: job_label_prefix
+        label: _("Job label prefix")
+        hint: _("Prefix for the Prometheus job label. Letters, digits and underscores only.")
+        value: "omv_rsync"
+      - type: textInput
+        name: instance
+        label: _("Instance label")
+        hint: _("Overrides the hostname in the Prometheus instance label. Leave empty to use system hostname.")
+        value: ""
+    buttons:
+      - template: submit
+        url: "/services/rsync-prometheus"
+      - template: cancel
+        url: "/services/rsync-prometheus"

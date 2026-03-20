@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+SALT_STATE_DIR = /srv/salt/omv/deploy/rsync-prometheus
+PKG_DIR = debian/openmediavault-rsync-prometheus
+
+%:
+	dh $@
+
+override_dh_install:
+	dh_install
+	install -D -m 0644 \
+		srv/salt/omv/deploy/rsync-prometheus/init.sls \
+		$(PKG_DIR)$(SALT_STATE_DIR)/init.sls
+	install -D -m 0644 \
+		srv/salt/omv/deploy/rsync-prometheus/files/wrapper.sh.j2 \
+		$(PKG_DIR)$(SALT_STATE_DIR)/files/wrapper.sh.j2
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod 0755 $(PKG_DIR)/usr/share/openmediavault/confdb/create.d/conf.service.rsyncp.sh
+	chmod 0755 $(PKG_DIR)/usr/share/openmediavault/scripts/omv-rsync-prometheus-test

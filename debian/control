@@ -1,0 +1,14 @@
+Source: openmediavault-rsync-prometheus
+Section: net
+Priority: optional
+Maintainer: Your Name <you@example.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+Homepage: https://github.com/yourname/openmediavault-rsync-prometheus
+
+Package: openmediavault-rsync-prometheus
+Architecture: all
+Depends: openmediavault (>= 7.0), curl
+Description: Prometheus metrics for OpenMediaVault rsync jobs
+ Wraps each rsync cronjob to push success/failure metrics and
+ duration to a configurable Prometheus Pushgateway after every run.

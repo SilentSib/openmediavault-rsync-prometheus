@@ -1,0 +1,38 @@
+#!/bin/sh
+set -e
+
+. /usr/share/openmediavault/scripts/helper-functions
+
+case "$1" in
+    configure)
+        # Seed config.xml with our default settings.
+        omv-confdbadm create "conf.service.rsyncp"
+
+        # Compile workbench YAML into the web interface.
+        omv-mkworkbench all
+
+        # Restart the RPC engine so it picks up the new rpc/module files
+        # and syncs the omv_conf/omv_utils Salt execution modules into
+        # /var/cache/salt/minion/extmods/ before we call omv-salt.
+        deb-systemd-invoke restart openmediavault-engined || true
+
+        # Sync Salt execution modules (omv_conf, omv_utils) into the minion
+        # extmods cache. Without this, omv_conf.get is unavailable and the
+        # SLS rendering fails with "AliasedLoader has no attribute omv_conf.get".
+        salt-call --local saltutil.sync_modules 2>/dev/null || true
+
+        # Apply the Salt state.
+        omv-salt deploy run rsync-prometheus || true
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+    *)
+        echo "postinst called with unknown argument '$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+exit 0

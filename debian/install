@@ -1,0 +1,9 @@
+usr/share/openmediavault/confdb/create.d/conf.service.rsyncp.sh usr/share/openmediavault/confdb/create.d/
+usr/share/openmediavault/workbench/component.d/omv-services-rsync-prometheus-settings-form-page.yaml usr/share/openmediavault/workbench/component.d/
+usr/share/openmediavault/workbench/navigation.d/90-services-rsync-prometheus.yaml usr/share/openmediavault/workbench/navigation.d/
+usr/share/openmediavault/workbench/route.d/services.rsync-prometheus.yaml usr/share/openmediavault/workbench/route.d/
+usr/share/openmediavault/engined/rpc/rsyncp.inc usr/share/openmediavault/engined/rpc/
+usr/share/openmediavault/engined/module/rsyncp.inc usr/share/openmediavault/engined/module/
+usr/share/openmediavault/datamodels/conf.service.rsyncp.json usr/share/openmediavault/datamodels/
+usr/share/openmediavault/datamodels/rpc.rsyncp.setsettings.json usr/share/openmediavault/datamodels/
+usr/share/openmediavault/scripts/omv-rsync-prometheus-test usr/share/openmediavault/scripts/
