@@ -331,3 +331,7 @@ Removes all plugin files, deletes wrapper scripts, removes the config node from 
 ## License
 
 GNU General Public License v3 or later.
+
+---
+
+Completely built using Claude free tier (Sonnet 4.6).
