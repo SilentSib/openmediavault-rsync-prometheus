@@ -335,3 +335,12 @@ GNU General Public License v3 or later.
 ---
 
 Completely built using Claude free tier (Sonnet 4.6).
+
+Not everything has been fully tested yet. 
+
+---
+
+## Known issues
+
+- One panel in the dashboard is not showing data
+- Emails, if enabled, are not being sent
