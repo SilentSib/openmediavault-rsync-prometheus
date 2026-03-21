@@ -1,0 +1,109 @@
+name: Build and Release .deb
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      # Build inside Debian 12 (Bookworm) to match the OMV 7 target environment
+      image: debian:bookworm
+
+    permissions:
+      contents: write   # needed to create GitHub releases and upload assets
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends \
+            git \
+            dpkg-dev \
+            debhelper \
+            devscripts \
+            lintian \
+            ca-certificates
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          # Strip the leading 'v' from the tag name: v1.2.3 → 1.2.3
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "Building version: ${VERSION}"
+
+      - name: Stamp version into debian/changelog
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DATE=$(date -R)
+          # Prepend a new changelog entry so dpkg-buildpackage picks up the
+          # correct version without requiring a manual changelog commit.
+          cat > /tmp/new_entry << ENTRY
+          openmediavault-rsync-prometheus (${VERSION}) stable; urgency=low
+
+            * Release ${VERSION}.
+
+           -- GitHub Actions <actions@github.com>  ${DATE}
+
+          ENTRY
+          # Prepend to existing changelog
+          cat /tmp/new_entry debian/changelog > /tmp/changelog_merged
+          cp /tmp/changelog_merged debian/changelog
+
+      - name: Build .deb package
+        run: |
+          dpkg-buildpackage -us -uc -b
+          # The .deb lands one directory above the source tree
+          ls -la ../*.deb
+
+      - name: Run lintian (non-blocking)
+        run: lintian ../*.deb || true
+
+      - name: Collect artifacts
+        id: artifacts
+        run: |
+          DEB_PATH=$(ls ../*.deb | head -1)
+          DEB_NAME=$(basename "$DEB_PATH")
+          echo "deb_path=${DEB_PATH}" >> "$GITHUB_OUTPUT"
+          echo "deb_name=${DEB_NAME}" >> "$GITHUB_OUTPUT"
+          echo "Built: ${DEB_NAME}"
+
+      - name: Upload .deb as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.artifacts.outputs.deb_name }}
+          path: ${{ steps.artifacts.outputs.deb_path }}
+          retention-days: 90
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "v${{ steps.version.outputs.version }}"
+          tag_name: ${{ github.ref_name }}
+          body: |
+            ## openmediavault-rsync-prometheus ${{ steps.version.outputs.version }}
+
+            ### Installation
+
+            Download the `.deb` below and install on your OMV host:
+
+            ```bash
+            sudo dpkg -i openmediavault-rsync-prometheus_${{ steps.version.outputs.version }}_all.deb
+            sudo apt-get install -f
+            ```
+
+            ### What's included
+            - Prometheus Pushgateway metrics for all OMV rsync cronjobs
+            - Settings page under **Services › Rsync Metrics**
+            - Grafana dashboard JSON in the repository root
+
+            See [README.md](https://github.com/${{ github.repository }}/blob/main/README.md) for full documentation.
+          files: ${{ steps.artifacts.outputs.deb_path }}
+          fail_on_unmatched_files: true
+          generate_release_notes: true
