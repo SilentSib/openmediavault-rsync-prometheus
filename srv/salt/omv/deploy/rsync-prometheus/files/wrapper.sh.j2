@@ -19,19 +19,24 @@ JOB_NAME="{{ job.uuid }}"
 {% endif %}
 
 # ── Run the actual rsync script ──────────────────────────────────────────────
-# OMV's rsync script always exits 0 even on failure — it handles its own
-# error reporting via syslog/email. We detect failure by checking stdout
-# for the exact message OMV emits: "The synchronisation failed."
+# Capture output for failure detection while also passing it through to stdout
+# so the cron pipeline (grep | mail) still receives it and sends email as usual.
+# A temp file is used because we need the full output both for tee (stdout) and
+# for grep (failure detection) — process substitution alone isn't POSIX sh safe.
+TMPOUT=$(mktemp)
 START_TIME=$(date +%s%3N)
-RSYNC_OUTPUT=$("$RSYNC_SCRIPT" 2>&1)
-RAW_EXIT=$?
+"$RSYNC_SCRIPT" 2>&1 | tee "$TMPOUT"
+# dash/sh does not support PIPESTATUS; OMV always exits 0 anyway
+ RAW_EXIT=0
 END_TIME=$(date +%s%3N)
+
+RSYNC_OUTPUT=$(cat "$TMPOUT")
+rm -f "$TMPOUT"
 
 DURATION_MS=$(( END_TIME - START_TIME ))
 TIMESTAMP=$(date +%s)
 
-# Primary: match OMV's exact failure string (case-insensitive for safety).
-# Secondary: honour a non-zero exit in case future OMV versions propagate it.
+# OMV always exits 0 even on failure. Detect failure via its exact output string.
 if echo "$RSYNC_OUTPUT" | grep -qiF "synchronisation failed"; then
     EXIT_CODE=1
 elif [ "$RAW_EXIT" -ne 0 ]; then
