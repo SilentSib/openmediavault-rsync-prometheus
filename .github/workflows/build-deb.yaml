@@ -4,6 +4,17 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (e.g. 1.2.3) — leave empty to use changelog version"
+        required: false
+        default: ""
+      create_release:
+        description: "Create a GitHub Release"
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -31,11 +42,19 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Extract version from tag
+      - name: Resolve version
         id: version
         run: |
-          # Strip the leading 'v' from the tag name: v1.2.3 → 1.2.3
-          VERSION="${GITHUB_REF_NAME#v}"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            # Triggered by a tag push — strip the leading 'v'
+            VERSION="${GITHUB_REF_NAME#v}"
+          elif [ -n "${{ inputs.version }}" ]; then
+            # Manually triggered with an explicit version
+            VERSION="${{ inputs.version }}"
+          else
+            # Manually triggered with no version — read from changelog
+            VERSION=$(dpkg-parsechangelog --show-field Version)
+          fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "Building version: ${VERSION}"
 
@@ -43,8 +62,6 @@ jobs:
         run: |
           VERSION="${{ steps.version.outputs.version }}"
           DATE=$(date -R)
-          # Prepend a new changelog entry so dpkg-buildpackage picks up the
-          # correct version without requiring a manual changelog commit.
           cat > /tmp/new_entry << ENTRY
           openmediavault-rsync-prometheus (${VERSION}) stable; urgency=low
 
@@ -53,14 +70,12 @@ jobs:
            -- GitHub Actions <actions@github.com>  ${DATE}
 
           ENTRY
-          # Prepend to existing changelog
           cat /tmp/new_entry debian/changelog > /tmp/changelog_merged
           cp /tmp/changelog_merged debian/changelog
 
       - name: Build .deb package
         run: |
           dpkg-buildpackage -us -uc -b
-          # The .deb lands one directory above the source tree
           ls -la ../*.deb
 
       - name: Run lintian (non-blocking)
@@ -83,10 +98,12 @@ jobs:
           retention-days: 90
 
       - name: Create GitHub Release
+        # Run on tag push, or when manually triggered with create_release=true
+        if: github.event_name == 'push' || inputs.create_release == true
         uses: softprops/action-gh-release@v2
         with:
           name: "v${{ steps.version.outputs.version }}"
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ github.event_name == 'push' && github.ref_name || format('v{0}', steps.version.outputs.version) }}
           body: |
             ## openmediavault-rsync-prometheus ${{ steps.version.outputs.version }}
 
