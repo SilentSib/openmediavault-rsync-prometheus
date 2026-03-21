@@ -8,7 +8,7 @@ Not everything has been fully tested yet but the main parts look solid.
 
 ## Raison d'être of this plugin
 
-I love OMV. I do. And the rsync cronjobs are a core feature in my usage of the software. So much so that I've been wanting some level of prometheus integration foe a while. The emails are nice but I wanted alertw to fire when something was not working instead of manually checking the body of each email every day. That's why I wanted something like this.
+I love OMV. I do. And the rsync cronjobs are a core feature in my usage of the software. So much so that I've been wanting some level of prometheus integration for a while. The emails are nice but I wanted alerts to fire when something was not working instead of manually checking the body of each email every day. That's why I wanted something like this.
 
 But because I have no time to dive deeply in the internals, I figured that a LLM could maybe help, which it did.
 
