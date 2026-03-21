@@ -348,4 +348,4 @@ GNU General Public License v3 or later.
 
 ## Known issues
 
-- One panel in the dashboard is not showing data
+/
