@@ -46,13 +46,10 @@ jobs:
         id: version
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
-            # Triggered by a tag push — strip the leading 'v'
             VERSION="${GITHUB_REF_NAME#v}"
           elif [ -n "${{ inputs.version }}" ]; then
-            # Manually triggered with an explicit version
             VERSION="${{ inputs.version }}"
           else
-            # Manually triggered with no version — read from changelog
             VERSION=$(dpkg-parsechangelog --show-field Version)
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
@@ -81,13 +78,14 @@ jobs:
       - name: Run lintian (non-blocking)
         run: lintian ../*.deb || true
 
-      - name: Collect artifacts
+      - name: Move .deb into workspace
         id: artifacts
         run: |
-          DEB_PATH=$(ls ../*.deb | head -1)
-          DEB_NAME=$(basename "$DEB_PATH")
-          echo "deb_path=${DEB_PATH}" >> "$GITHUB_OUTPUT"
+          mkdir -p dist
+          cp ../*.deb dist/
+          DEB_NAME=$(ls dist/*.deb | head -1 | xargs basename)
           echo "deb_name=${DEB_NAME}" >> "$GITHUB_OUTPUT"
+          echo "deb_path=dist/${DEB_NAME}" >> "$GITHUB_OUTPUT"
           echo "Built: ${DEB_NAME}"
 
       - name: Upload .deb as workflow artifact
@@ -98,7 +96,6 @@ jobs:
           retention-days: 90
 
       - name: Create GitHub Release
-        # Run on tag push, or when manually triggered with create_release=true
         if: github.event_name == 'push' || inputs.create_release == true
         uses: softprops/action-gh-release@v2
         with:
