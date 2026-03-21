@@ -2,9 +2,9 @@
 
 An [OpenMediaVault 7](https://www.openmediavault.org/) plugin that wraps every rsync cronjob to push **success/failure metrics** to a [Prometheus Pushgateway](https://github.com/prometheus/pushgateway) after each run — without touching OMV's own scripts or configuration.
 
-Completely built using Claude free tier (Sonnet 4.6).
+Completely built using Claude's free tier (Sonnet 4.6).
 
-Not everything has been fully tested yet but the main parts look solid
+Not everything has been fully tested yet but the main parts look solid.
 
 ## Raison d'être of this plugin
 
