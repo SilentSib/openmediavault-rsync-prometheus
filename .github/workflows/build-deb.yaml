@@ -4,17 +4,6 @@ on:
   push:
     tags:
       - "v*.*.*"
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Version to build (e.g. 1.2.3) — leave empty to use changelog version"
-        required: false
-        default: ""
-      create_release:
-        description: "Create a GitHub Release"
-        required: false
-        type: boolean
-        default: false
 
 jobs:
   build:
