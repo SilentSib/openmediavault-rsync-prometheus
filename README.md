@@ -167,7 +167,7 @@ Click **Save**, then **Apply**. OMV will regenerate the wrapper scripts and patc
 
 ### Giving jobs friendly names
 
-The `name` label uses the **Comment** field of each rsync job. Edit a job under **Services › Rsync**, fill in the Comment field, save, and apply. The wrappers are regenerated immediately with the new name — no reinstall needed.
+The `name` label uses the **tag** field of each rsync job. Edit a job under **Services › Rsync**, fill in the tag field, save, and apply. The wrappers are regenerated immediately with the new name — no reinstall needed.
 
 ---
 
