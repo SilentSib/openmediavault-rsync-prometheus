@@ -33,7 +33,7 @@ All metrics carry three labels:
 |---|---|
 | `job` | `<prefix>_<uuid>` e.g. `omv_rsync_2e0188a7_88a5_...` |
 | `instance` | Hostname (or custom override from settings) |
-| `name` | Human-friendly name: the job's **Comment** field, or UUID if no comment is set |
+| `name` | Human-friendly name: the job's **tag** field, or UUID if no comment is set |
 
 > **Tip:** set a tag on each rsync job in the OMV UI (`Services › Rsync › Edit`) to get readable `name` labels like `"TV Shows"` or `"Nightly Backup"`.
 
