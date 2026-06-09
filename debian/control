@@ -1,14 +1,22 @@
 Source: openmediavault-rsync-prometheus
-Section: net
+Section: admin
 Priority: optional
-Maintainer: SilentSib <sibalot@hotmail.fr>
-Build-Depends: debhelper-compat (= 13)
-Standards-Version: 4.6.0
-Homepage: https://github.com/SilentSib/openmediavault-rsync-prometheus
+Maintainer: SilentSib <silentsib@example.com>
+Build-Depends: debhelper-compat (= 13), \
+               openmediavault (>= 8.0.0), \
+               openmediavault-openmediavault (>= 8.0.0), \
+               prometheus-client (>= 0.15.0), \
+               python3, python3-pip
+Standards-Version: 4.6.1
+Vcs-Browser: https://github.com/SilentSib/openmediavault-rsync-prometheus
+Vcs-Git: https://github.com/SilentSib/openmediavault-rsync-prometheus.git
 
 Package: openmediavault-rsync-prometheus
-Architecture: all
-Depends: openmediavault (>= 7.0), curl
-Description: Prometheus metrics for OpenMediaVault rsync jobs
- Wraps each rsync cronjob to push success/failure metrics and
- duration to a configurable Prometheus Pushgateway after every run.
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, \
+         openmediavault (>= 8.0.0), \
+         prometheus-client (>= 0.15.0)
+Provides: openmediavault-rsync-prometheus
+Description: Rsync metrics pushgateway plugin for OpenMediaVault 8
+         This plugin monitors rsync jobs and pushes metrics to a 
+         Prometheus Pushgateway.

@@ -1,0 +1,18 @@
+[Unit]
+Description=OMV Rsync Prometheus Push Service
+Documentation=https://github.com/SilentSib/openmediavault-rsync-prometheus
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /usr/share/openmediavault/scripts/omv-rsync-prometheus-monitor.py
+Restart=on-failure
+RestartSec=30
+StandardOutput=append:/var/log/omv-rsync-prometheus.log
+StandardError=append:/var/log/omv-rsync-prometheus.log
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target

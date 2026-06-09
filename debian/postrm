@@ -5,14 +5,17 @@ set -e
 
 case "$1" in
     purge)
-        # Remove config node directly via xmlstarlet — omv-confdbadm delete
-        # requires the datamodel file which is already gone at purge time.
+        # Remove config node directly via xmlstarlet
         if omv_config_exists "/config/services/rsyncp"; then
             omv_config_delete "/config/services/rsyncp"
         fi
 
-        # Remove generated wrapper scripts
-        rm -rf /usr/local/lib/omv-rsync-prometheus || true
+        # Remove systemd service files
+        systemctl disable omv-rsync-prometheus.service 2>/dev/null || true
+        systemctl stop omv-rsync-prometheus.service 2>/dev/null || true
+        rm -f /etc/systemd/system/omv-rsync-prometheus.service
+        rm -f /etc/systemd/system/omv-rsync-prometheus.timer
+        rm -f /etc/systemd/system/omv-rsync-prometheus.service.d/*.conf 2>/dev/null || true
 
         # Restore crontab to direct calls if still patched
         if [ -f /etc/cron.d/openmediavault-rsync ]; then
@@ -29,6 +32,8 @@ case "$1" in
         ;;
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        # Handle upgrade from OMV 7 (remove Salt states if present)
+        rm -rf /srv/salt/omv/deploy/rsync-prometheus 2>/dev/null || true
         ;;
 
     *)

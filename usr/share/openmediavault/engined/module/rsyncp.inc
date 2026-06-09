@@ -19,21 +19,15 @@ class RsyncPrometheus extends \OMV\Engine\Module\ServiceAbstract
     }
 
     public function applyConfig() {
-        $this->exec("omv-salt deploy run rsync-prometheus");
+        // OMV 8: Start/stop systemd service directly
+        if ($this->getConfig()['enable'] ?? false) {
+            $this->exec("systemctl daemon-reload");
+            $this->exec("systemctl enable --now omv-rsync-prometheus");
+        } else {
+            $this->exec("systemctl disable omv-rsync-prometheus");
+            $this->exec("systemctl stop omv-rsync-prometheus");
+        }
     }
 
-    public function bindListeners(\OMV\Engine\Notify\Dispatcher $dispatcher) {
-        // Mark dirty when our own settings are saved.
-        $dispatcher->addListener(
-            OMV_NOTIFY_MODIFY,
-            "org.openmediavault.conf.service.rsyncp",
-            [$this, "setDirty"]
-        );
-        // Mark dirty when rsync jobs change so wrappers stay in sync.
-        $dispatcher->addListener(
-            OMV_NOTIFY_CREATE | OMV_NOTIFY_MODIFY | OMV_NOTIFY_DELETE,
-            "org.openmediavault.conf.service.rsync.job",
-            [$this, "setDirty"]
-        );
-    }
+    // OMV 8: No longer need bindListeners() - engined auto-reloads on config change
 }

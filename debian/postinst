@@ -11,18 +11,11 @@ case "$1" in
         # Compile workbench YAML into the web interface.
         omv-mkworkbench all
 
-        # Restart the RPC engine so it picks up the new rpc/module files
-        # and syncs the omv_conf/omv_utils Salt execution modules into
-        # /var/cache/salt/minion/extmods/ before we call omv-salt.
-        deb-systemd-invoke restart openmediavault-engined || true
-
-        # Sync Salt execution modules (omv_conf, omv_utils) into the minion
-        # extmods cache. Without this, omv_conf.get is unavailable and the
-        # SLS rendering fails with "AliasedLoader has no attribute omv_conf.get".
-        salt-call --local saltutil.sync_modules 2>/dev/null || true
-
-        # Apply the Salt state.
-        omv-salt deploy run rsync-prometheus || true
+        # OMV 8: Start systemd service directly (no Salt)
+        systemctl daemon-reload || true
+        if omv_config_get /config/services/rsyncp/enable | grep -q 1; then
+            systemctl enable --now omv-rsync-prometheus.service || true
+        fi
         ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
