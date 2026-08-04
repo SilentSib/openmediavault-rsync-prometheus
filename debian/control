@@ -1,10 +1,10 @@
 Source: openmediavault-rsync-prometheus
 Section: net
 Priority: optional
-Maintainer: Your Name <you@example.com>
+Maintainer: SilentSib <sibalot@hotmail.fr>
 Build-Depends: debhelper-compat (= 13)
 Standards-Version: 4.6.0
-Homepage: https://github.com/yourname/openmediavault-rsync-prometheus
+Homepage: https://github.com/SilentSib/openmediavault-rsync-prometheus
 
 Package: openmediavault-rsync-prometheus
 Architecture: all
