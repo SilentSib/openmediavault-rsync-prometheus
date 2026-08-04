@@ -1,5 +1,13 @@
+openmediavault-rsync-prometheus (1.0.1) stable; urgency=medium
+
+  * Fix: mark module dirty when a shared folder referenced by an rsync
+    job changes, so external tools (e.g. Terraform) modifying shared
+    folders no longer silently revert the wrapper crontab patch.
+
+ -- SilentSib <sibalot@hotmail.fr>  Tue, 04 Aug 2026 08:32:42 +0200
+
 openmediavault-rsync-prometheus (1.0.0) stable; urgency=low
 
   * Initial release.
 
- -- SilentSib <sibalot@hotmail.fr> Thu, 19 Mar 2026 00:00:00 +0000
+ -- SilentSib <sibalot@hotmail.fr>  Thu, 19 Mar 2026 00:00:00 +0000
