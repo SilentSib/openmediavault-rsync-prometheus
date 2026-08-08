@@ -1,3 +1,9 @@
+openmediavault-rsync-prometheus (1.0.2) stable; urgency=medium
+
+  * Fix: fix pre-inst and post-inst scripts
+
+ -- SilentSib <sibalot@hotmail.fr>  Tue, 08 Aug 2026 07:17:42 +0200
+
 openmediavault-rsync-prometheus (1.0.1) stable; urgency=medium
 
   * Fix: mark module dirty when a shared folder referenced by an rsync
