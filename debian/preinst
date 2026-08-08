@@ -8,9 +8,6 @@ case "$1" in
         # copy even after the source file on disk has been replaced by dpkg.
         rm -rf /var/cache/salt/minion/files/base/omv/deploy/rsync-prometheus
 
-        # Also remove the compiled state cache
-        rm -rf /var/cache/salt/minion/extmods/
-
         # Remove the state directory itself so dpkg lays down a clean copy
         rm -rf /srv/salt/omv/deploy/rsync-prometheus
         ;;

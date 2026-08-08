@@ -19,7 +19,7 @@ case "$1" in
         # Sync Salt execution modules (omv_conf, omv_utils) into the minion
         # extmods cache. Without this, omv_conf.get is unavailable and the
         # SLS rendering fails with "AliasedLoader has no attribute omv_conf.get".
-        salt-call --local saltutil.sync_modules 2>/dev/null || true
+        salt-call --local saltutil.sync_all 2>/dev/null || true
 
         # Apply the Salt state.
         omv-salt deploy run rsync-prometheus || true
